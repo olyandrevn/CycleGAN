@@ -1,6 +1,21 @@
 from .dataset import *
 from .utils import *
 
+
+@dataclass
+class DatasetsClass:
+    train_a: ImageDatasetNoLabel
+    train_b: ImageDatasetNoLabel
+    test_a: ImageDatasetNoLabel
+    test_b: ImageDatasetNoLabel
+
+@dataclass
+class DataLoadersClass:
+    train_a: DataLoader
+    train_b: DataLoader
+    test_a: DataLoader
+    test_b: DataLoader
+
 def prepare_dataset(target_folder):
     ds = DatasetsClass(
     train_a=ImageDatasetNoLabel(os.path.join(target_folder, "trainA")),
