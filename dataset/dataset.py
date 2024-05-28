@@ -2,7 +2,7 @@ import os
 import cv2
 
 from torch.utils.data import Dataset, DataLoader
-
+from dataclasses import dataclass
 
 class ImageDatasetNoLabel(Dataset):
     def __init__(self, data_folder, transforms=None):
