@@ -17,7 +17,7 @@ class ImageDatasetNoLabel(Dataset):
             img_path = os.path.join(data_folder, img_path)
             img = cv2.imread(img_path)
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-            img = cv2.resize(img, (64, 64))
+            img = cv2.resize(img, (128, 128))
             images.append(img)
 
         return images
