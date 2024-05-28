@@ -285,7 +285,7 @@ def learning_loop(
     return model, optimizer_d, optimizer_g, plots
 
 
-def create_model_and_optimizer(model_class, model_params, lr=2e-4, betas=(0.5, 0.999), device=device):
+def create_model_and_optimizer(model_class, model_params, lr=2e-4, betas=(0.5, 0.999), device='cuda'):
     model = model_class(**model_params)
     model.to(device)
 
