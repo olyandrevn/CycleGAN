@@ -1,27 +1,12 @@
-from .dataset import *
+from .dataset import ImageDatasetNoLabel, DatasetsClass, DataLoadersClass
 from .utils import *
-
-
-@dataclass
-class DatasetsClass:
-    train_a: ImageDatasetNoLabel
-    train_b: ImageDatasetNoLabel
-    test_a: ImageDatasetNoLabel
-    test_b: ImageDatasetNoLabel
-
-@dataclass
-class DataLoadersClass:
-    train_a: DataLoader
-    train_b: DataLoader
-    test_a: DataLoader
-    test_b: DataLoader
 
 def prepare_dataset(target_folder):
     ds = DatasetsClass(
-    train_a=ImageDatasetNoLabel(os.path.join(target_folder, "trainA")),
-    train_b=ImageDatasetNoLabel(os.path.join(target_folder, "trainB")),
-    test_a=ImageDatasetNoLabel(os.path.join(target_folder, "testA")),
-    test_b=ImageDatasetNoLabel(os.path.join(target_folder, "testB")),
+        train_a=ImageDatasetNoLabel(os.path.join(target_folder, "trainA")),
+        train_b=ImageDatasetNoLabel(os.path.join(target_folder, "trainB")),
+        test_a=ImageDatasetNoLabel(os.path.join(target_folder, "testA")),
+        test_b=ImageDatasetNoLabel(os.path.join(target_folder, "testB")),
     )
 
     channel_mean_a, channel_std_a = get_channel_statistics(ds.train_a)
