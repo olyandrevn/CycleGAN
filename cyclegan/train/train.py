@@ -3,7 +3,7 @@ import warnings
 from collections import defaultdict
 import torch.optim as optim
 import torch.nn.functional as F
-from .utils import *
+from cyclegan.train.utils import *
 
 def train_discriminators(model, opt_d, loader_a, loader_b, criterion_d):
     model.train()

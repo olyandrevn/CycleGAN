@@ -1,5 +1,5 @@
-from generator import *
-from discriminator import *
+from cyclegan.model.generator import *
+from cyclegan.model.discriminator import *
 
 class CycleGAN(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, n_filters=64, n_blocks=6, n_downsample=2, n_layers=3):

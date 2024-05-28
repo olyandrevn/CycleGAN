@@ -1,4 +1,4 @@
-from blocks import *
+from cyclegan.model.blocks import *
 
 class ResNetGenerator(nn.Module):
     def __init__(self, in_channels=3, out_channels=3, n_filters=64, n_blocks=6, n_downsample=2):

@@ -1,4 +1,4 @@
-from blocks import *
+from cyclegan.model.blocks import *
 
 class PatchGAN(nn.Module):
     def __init__(self, in_channels=3, n_filters=64, n_layers=3):

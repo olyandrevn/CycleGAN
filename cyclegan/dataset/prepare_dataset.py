@@ -1,5 +1,5 @@
-from .dataset import ImageDatasetNoLabel, DatasetsClass, DataLoadersClass
-from .utils import *
+from cyclegan.dataset.dataset import ImageDatasetNoLabel, DatasetsClass, DataLoadersClass
+from cyclegan.dataset.utils import *
 
 def prepare_dataset(target_folder):
     ds = DatasetsClass(
