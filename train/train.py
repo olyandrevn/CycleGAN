@@ -1,5 +1,8 @@
 from IPython.display import clear_output
 import warnings
+from collections import defaultdict
+import torch.optim as optim
+import torch.nn.functional as F
 from utils import *
 
 def train_discriminators(model, opt_d, loader_a, loader_b, criterion_d):
@@ -64,10 +67,6 @@ def train_generators(model, opt_g, loader_a, loader_b, criterion_g):
         losses_tr.append(loss.item())
 
     return model, opt_g, np.mean(losses_tr)
-
-
-
-from collections import defaultdict
 
 def val(model, loader_a, loader_b, criterion_d, criterion_g):
     model.eval()
@@ -284,3 +283,20 @@ def learning_loop(
 
     wandb.finish()
     return model, optimizer_d, optimizer_g, plots
+
+
+def create_model_and_optimizer(model_class, model_params, lr=2e-4, betas=(0.5, 0.999), device=device):
+    model = model_class(**model_params)
+    model.to(device)
+
+    optimizer_d = optim.Adam(
+        list(model.D_A.parameters()) + list(model.D_B.parameters()),
+        lr=lr,
+        betas=betas
+    )
+    optimizer_g = optim.Adam(
+        list(model.G_AB.parameters()) + list(model.G_BA.parameters()),
+        lr=lr,
+        betas=betas
+    )
+    return model, optimizer_d, optimizer_g

@@ -3,22 +3,6 @@ import wandb
 from collections import defaultdict
 from termcolor import colored
 
-def create_model_and_optimizer(model_class, model_params, lr=2e-4, betas=(0.5, 0.999), device=device):
-    model = model_class(**model_params)
-    model.to(device)
-
-    optimizer_d = optim.Adam(
-        list(model.D_A.parameters()) + list(model.D_B.parameters()),
-        lr=lr,
-        betas=betas
-    )
-    optimizer_g = optim.Adam(
-        list(model.G_AB.parameters()) + list(model.G_BA.parameters()),
-        lr=lr,
-        betas=betas
-    )
-    return model, optimizer_d, optimizer_g
-
 def get_model_name(chkp_folder, model_name=None):
     # Выбираем имя чекпоинта для сохранения
     if model_name is None:
