@@ -1,3 +1,0 @@
-cyclegan/dataset
-cyclegan/model
-cyclegan/train
