@@ -1,8 +1,7 @@
-import os
-from cyclegan.dataset.dataset import ImageDatasetNoLabel, DatasetsClass, DataLoadersClass
+from cyclegan.dataset.dataset import *
 from cyclegan.dataset.utils import *
 
-def prepare_dataset(target_folder):
+def prepare_dataset(target_folder, batch_size):
     ds = DatasetsClass(
         train_a=ImageDatasetNoLabel(os.path.join(target_folder, "trainA")),
         train_b=ImageDatasetNoLabel(os.path.join(target_folder, "trainB")),
