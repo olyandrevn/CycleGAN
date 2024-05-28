@@ -1,3 +1,4 @@
+import os
 from cyclegan.dataset.dataset import ImageDatasetNoLabel, DatasetsClass, DataLoadersClass
 from cyclegan.dataset.utils import *
 
