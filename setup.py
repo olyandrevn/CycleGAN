@@ -20,7 +20,6 @@ def main():
         ],
         python_requires='>=3.7',
         install_requires=[
-            'einops>=0.3',
         ],
     )
 

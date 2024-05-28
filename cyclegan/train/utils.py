@@ -1,10 +1,14 @@
 import os
 import wandb
+import warnings
+import torch
 from collections import defaultdict
 from termcolor import colored
 
+import matplotlib.pyplot as plt
+%matplotlib inline
+
 def get_model_name(chkp_folder, model_name=None):
-    # Выбираем имя чекпоинта для сохранения
     if model_name is None:
         if os.path.exists(chkp_folder):
             num_starts = len(os.listdir(chkp_folder)) + 1
@@ -29,7 +33,7 @@ def get_lr(optimizer):
         return param_group['lr']
 
 
-def draw_imgs(model, num_images, loader_a, loader_b, de_norm_a, de_norm_b):
+def draw_imgs(model, num_images, loader_a, loader_b, de_norm_a, de_norm_b, device='cuda'):
     model.eval()
     with torch.no_grad():
         imgs_a = next(iter(loader_a))[:num_images].to(device)

@@ -2,32 +2,22 @@ import torch
 import torch.nn as nn
 
 class CycleConsistencyLoss(nn.Module):
-    """
-    Функция ошибки, проверяющая что после двойного перехода через генераторы изображение не изменилось
-    """
     def __init__(self, device='cuda'):
         super(CycleConsistencyLoss, self).__init__()
         self.device = device
         self.l1_loss = nn.L1Loss()
 
     def forward(self, x, x_rec):
-        # Принимает на вход оригинальное изображение и изображение после двойного перехода
         loss = self.l1_loss(x, x_rec)
         return loss
 
 class AdversarialLossCE(nn.Module):
-    """
-    Стандартная функция ошибки для minmax игры GAN-ов
-    """
     def __init__(self, device='cuda'):
         super(AdversarialLossCE, self).__init__()
         self.device = device
         self.bce_loss = nn.BCEWithLogitsLoss()
 
     def forward(self, real_pred, fake_pred=None):
-        # Принимает на вход D_{A}(a) - real_pred и D_{A}(G(b)) - fake_pred или наоборот
-        # Может принимать только один аргумент для удобности использования в случае
-        # обучения или генератора, или дискриминатора
         if fake_pred is not None: # only discriminator
             ones = torch.ones_like(real_pred, device=self.device)
             zeros = torch.zeros_like(fake_pred, device=self.device)
@@ -41,18 +31,12 @@ class AdversarialLossCE(nn.Module):
 
 
 class AdversarialLossMSE(nn.Module):
-    """
-    Можно переписать не через CE, а через MSE loss на одном предсказании, помогает со стабильностью
-    """
     def __init__(self, device='cuda'):
         super(AdversarialLossMSE, self).__init__()
         self.device = device
         self.l2_loss = nn.MSELoss()
 
     def forward(self, real_pred, fake_pred=None):
-        # Принимает на вход D_{A}(a) - real_pred и D_{A}(G(b)) - fake_pred или наоборот
-        # Может принимать только один аргумент для удобности использования в случае
-        # обучения или генератора, или дискриминатора
         if fake_pred is not None: # only discriminator
             ones = torch.ones_like(real_pred, device=self.device)
             zeros = torch.zeros_like(fake_pred, device=self.device)
@@ -65,9 +49,6 @@ class AdversarialLossMSE(nn.Module):
         return loss
 
 class FullDiscriminatorLoss(nn.Module):
-    """
-    Полная ошибка для дискриминатора
-    """
     def __init__(self, is_mse=True, device='cuda'):
         super(FullDiscriminatorLoss, self).__init__()
         self.adversarial_loss_func = AdversarialLossMSE(device=device) if is_mse else AdversarialLossCE(device=device)
@@ -85,9 +66,6 @@ class FullDiscriminatorLoss(nn.Module):
         return loss
 
 class FullGeneratorLoss(nn.Module):
-    """
-    Полная ошибка для генератора
-    """
     def __init__(self, lambda_value=10., is_mse=True, device='cuda'):
         super(FullGeneratorLoss, self).__init__()
         self.adversarial_loss_func = AdversarialLossMSE(device=device) if is_mse else AdversarialLossCE(device=device)

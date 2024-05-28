@@ -1,11 +1,15 @@
 from IPython.display import clear_output
-import warnings
+
 from collections import defaultdict
+import numpy as np
+import torch
 import torch.optim as optim
 import torch.nn.functional as F
+from tqdm.auto import trange
+
 from cyclegan.train.utils import *
 
-def train_discriminators(model, opt_d, loader_a, loader_b, criterion_d):
+def train_discriminators(model, opt_d, loader_a, loader_b, criterion_d, device='cuda'):
     model.train()
     losses_tr = []
 
@@ -37,7 +41,7 @@ def train_discriminators(model, opt_d, loader_a, loader_b, criterion_d):
     return model, opt_d, np.mean(losses_tr)
 
 
-def train_generators(model, opt_g, loader_a, loader_b, criterion_g):
+def train_generators(model, opt_g, loader_a, loader_b, criterion_g, device='cuda'):
     model.train()
     losses_tr = []
 
@@ -68,7 +72,7 @@ def train_generators(model, opt_g, loader_a, loader_b, criterion_g):
 
     return model, opt_g, np.mean(losses_tr)
 
-def val(model, loader_a, loader_b, criterion_d, criterion_g):
+def val(model, loader_a, loader_b, criterion_d, criterion_g, device='cuda'):
     model.eval()
 
     val_data = defaultdict(list)

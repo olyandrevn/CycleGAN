@@ -25,7 +25,7 @@ def prepare_dataset(target_folder, batch_size):
         ),
         train_b=ImageDatasetNoLabel(
             os.path.join(target_folder, "trainB"),
-            transforms=val_transform_b,
+            transforms=train_transform_b,
         ),
         test_a=ImageDatasetNoLabel(
             os.path.join(target_folder, "testA"),
@@ -68,4 +68,4 @@ def prepare_dataset(target_folder, batch_size):
         ),
     )
 
-    return dataloaders
+    return dataloaders, de_normalize_a, de_normalize_b

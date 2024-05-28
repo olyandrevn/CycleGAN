@@ -1,5 +1,6 @@
 import os
 import cv2
+import numpy as np
 
 from torch.utils.data import Dataset, DataLoader
 from dataclasses import dataclass
