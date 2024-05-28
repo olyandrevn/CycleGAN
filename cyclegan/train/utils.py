@@ -6,7 +6,6 @@ from collections import defaultdict
 from termcolor import colored
 
 import matplotlib.pyplot as plt
-%matplotlib inline
 
 def get_model_name(chkp_folder, model_name=None):
     if model_name is None:
