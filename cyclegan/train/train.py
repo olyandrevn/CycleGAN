@@ -194,14 +194,15 @@ def learning_loop(
             loss_g.append(loss)
         plots['train G'].extend(loss_g)
 
-        # Log training metrics to wandb
-        wandb.log({
-            "Train Discriminator Loss": np.mean(loss_d),
-            "Train Generator Loss": np.mean(loss_g),
-            "Learning Rate D": get_lr(optimizer_d),
-            "Learning Rate G": get_lr(optimizer_g),
-            "Epoch": epoch
-        })
+        if is_wandb:
+            # Log training metrics to wandb
+            wandb.log({
+                "Train Discriminator Loss": np.mean(loss_d),
+                "Train Generator Loss": np.mean(loss_g),
+                "Learning Rate D": get_lr(optimizer_d),
+                "Learning Rate G": get_lr(optimizer_g),
+                "Epoch": epoch
+            })
 
         if not (epoch % val_every):
             print("validate")
@@ -252,59 +253,59 @@ def learning_loop(
                 except:
                     scheduler_g.step(loss_g)
 
-            if not (epoch % draw_every):
-                clear_output(True)
+        if not (epoch % draw_every):
+            clear_output(True)
 
-                hh = 2
-                ww = 2
-                plt_ind = 1
-                fig, ax = plt.subplots(hh, ww, figsize=(25, 12))
-                fig.suptitle(f'#{epoch}/{epochs}:')
+            hh = 2
+            ww = 2
+            plt_ind = 1
+            fig, ax = plt.subplots(hh, ww, figsize=(25, 12))
+            fig.suptitle(f'#{epoch}/{epochs}:')
 
-                plt.subplot(hh, ww, plt_ind)
-                plt.title('discriminators losses')
-                d_plot_step = 1. / d_iters_per_epoch
-                plt.plot(np.arange(d_plot_step, epoch + d_plot_step, d_plot_step), plots['train D'], 'r.-', label='train', alpha=0.7)
-                plt.plot(np.arange(1, epoch + 1), plots['val D'], 'g.-', label='val', alpha=0.7)
-                plt.grid()
-                plt.legend()
-                plt_ind += 1
+            plt.subplot(hh, ww, plt_ind)
+            plt.title('discriminators losses')
+            d_plot_step = 1. / d_iters_per_epoch
+            plt.plot(np.arange(d_plot_step, epoch + d_plot_step, d_plot_step), plots['train D'], 'r.-', label='train', alpha=0.7)
+            plt.plot(np.arange(1, epoch + 1), plots['val D'], 'g.-', label='val', alpha=0.7)
+            plt.grid()
+            plt.legend()
+            plt_ind += 1
 
-                plt.subplot(hh, ww, plt_ind)
-                plt.title('generators losses')
-                g_plot_step = 1. / g_iters_per_epoch
-                plt.plot(np.arange(g_plot_step, epoch + g_plot_step, g_plot_step), plots['train G'], 'r.-', label='train', alpha=0.7)
-                plt.plot(np.arange(1, epoch + 1), plots['val G'], 'g.-', label='val', alpha=0.7)
-                plt.grid()
-                plt.legend()
-                plt_ind += 1
+            plt.subplot(hh, ww, plt_ind)
+            plt.title('generators losses')
+            g_plot_step = 1. / g_iters_per_epoch
+            plt.plot(np.arange(g_plot_step, epoch + g_plot_step, g_plot_step), plots['train G'], 'r.-', label='train', alpha=0.7)
+            plt.plot(np.arange(1, epoch + 1), plots['val G'], 'g.-', label='val', alpha=0.7)
+            plt.grid()
+            plt.legend()
+            plt_ind += 1
 
-                # plt.subplot(hh, ww, plt_ind)
-                # plt.title('learning rates')
-                # plt.plot(plots["lr D"], 'b.-', label='lr discriminator', alpha=0.7)
-                # plt.plot(plots["lr G"], 'm.-', label='lr generator', alpha=0.7)
-                # plt.legend()
-                # plt_ind += 1
+            # plt.subplot(hh, ww, plt_ind)
+            # plt.title('learning rates')
+            # plt.plot(plots["lr D"], 'b.-', label='lr discriminator', alpha=0.7)
+            # plt.plot(plots["lr G"], 'm.-', label='lr generator', alpha=0.7)
+            # plt.legend()
+            # plt_ind += 1
 
-                plt.subplot(hh, ww, plt_ind)
-                plt.title("Discriminator A predictions")
-                plt.hist(plots["hist real A"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
-                plt.hist(plots["hist gen A"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
-                plt.xlim((-0.05, 1.05))
-                plt.xticks(ticks=np.arange(0, 1.05, 0.1))
-                plt.legend()
-                plt_ind += 1
+            plt.subplot(hh, ww, plt_ind)
+            plt.title("Discriminator A predictions")
+            plt.hist(plots["hist real A"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
+            plt.hist(plots["hist gen A"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
+            plt.xlim((-0.05, 1.05))
+            plt.xticks(ticks=np.arange(0, 1.05, 0.1))
+            plt.legend()
+            plt_ind += 1
 
-                plt.subplot(hh, ww, plt_ind)
-                plt.title("Discriminator B predictions")
-                plt.hist(plots["hist real B"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
-                plt.hist(plots["hist gen B"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
-                plt.xlim((-0.05, 1.05))
-                plt.xticks(ticks=np.arange(0, 1.05, 0.1))
-                plt.legend()
-                plt_ind += 1
+            plt.subplot(hh, ww, plt_ind)
+            plt.title("Discriminator B predictions")
+            plt.hist(plots["hist real B"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
+            plt.hist(plots["hist gen B"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
+            plt.xlim((-0.05, 1.05))
+            plt.xticks(ticks=np.arange(0, 1.05, 0.1))
+            plt.legend()
+            plt_ind += 1
 
-                plt.show()
+            plt.show()
 
             draw_imgs(model, images_per_validation, val_loader_a, val_loader_b, de_norm_a, de_norm_b, is_wandb)
 
