@@ -153,7 +153,8 @@ def learning_loop(
     chkp_folder="./chkps",
     images_per_validation=3,
     plots=None,
-    starting_epoch=0
+    starting_epoch=0,
+    is_wandb=False
 ):
     model_name = get_model_name(chkp_folder, model_name)
 
@@ -212,42 +213,16 @@ def learning_loop(
             plots['hist real B'].append(val_data["real pred B"])
             plots['hist gen B'].append(val_data["fake pred B"])
 
-            clear_output(True)
+            if is_wandb:
+                # Log validation metrics to wandb
+                wandb.log({
+                    "Validation Discriminator Loss": val_data["loss D"],
+                    "Validation Generator Loss": val_data["loss G"], 
+                    "Epoch": epoch
+                })
 
-            hh = 1
-            ww = 2
-            plt_ind = 1
-            fig, ax = plt.subplots(hh, ww, figsize=(25, 12))
-            fig.suptitle(f'#{epoch}/{epochs}:')
+                save_model(epoch, model_name, model)
 
-            plt.subplot(hh, ww, plt_ind)
-            plt.title("Discriminator A predictions")
-            plt.hist(plots["hist real A"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
-            plt.hist(plots["hist gen A"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
-            plt.xlim((-0.05, 1.05))
-            plt.xticks(ticks=np.arange(0, 1.05, 0.1))
-            plt.legend()
-            plt_ind += 1
-
-            plt.subplot(hh, ww, plt_ind)
-            plt.title("Discriminator B predictions")
-            plt.hist(plots["hist real B"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
-            plt.hist(plots["hist gen B"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
-            plt.xlim((-0.05, 1.05))
-            plt.xticks(ticks=np.arange(0, 1.05, 0.1))
-            plt.legend()
-            plt_ind += 1
-
-            plt.show()
-
-            # Log validation metrics to wandb
-            wandb.log({
-                "Validation Discriminator Loss": val_data["loss D"],
-                "Validation Generator Loss": val_data["loss G"], 
-                "Epoch": epoch
-            })
-
-            draw_imgs(model, images_per_validation, val_loader_a, val_loader_b, de_norm_a, de_norm_b)
 
             # Save model checkpoint
             if not os.path.exists(chkp_folder):
@@ -264,8 +239,6 @@ def learning_loop(
                 },
                 os.path.join(chkp_folder, model_name + '.pt'),
             )
-            
-            save_model(epoch, model_name, model)
 
             # Scheduler step
             if scheduler_d:
@@ -279,6 +252,62 @@ def learning_loop(
                 except:
                     scheduler_g.step(loss_g)
 
+            if not (epoch % draw_every):
+                clear_output(True)
+
+                hh = 2
+                ww = 2
+                plt_ind = 1
+                fig, ax = plt.subplots(hh, ww, figsize=(25, 12))
+                fig.suptitle(f'#{epoch}/{epochs}:')
+
+                plt.subplot(hh, ww, plt_ind)
+                plt.title('discriminators losses')
+                d_plot_step = 1. / d_iters_per_epoch
+                plt.plot(np.arange(d_plot_step, epoch + d_plot_step, d_plot_step), plots['train D'], 'r.-', label='train', alpha=0.7)
+                plt.plot(np.arange(1, epoch + 1), plots['val D'], 'g.-', label='val', alpha=0.7)
+                plt.grid()
+                plt.legend()
+                plt_ind += 1
+
+                plt.subplot(hh, ww, plt_ind)
+                plt.title('generators losses')
+                g_plot_step = 1. / g_iters_per_epoch
+                plt.plot(np.arange(g_plot_step, epoch + g_plot_step, g_plot_step), plots['train G'], 'r.-', label='train', alpha=0.7)
+                plt.plot(np.arange(1, epoch + 1), plots['val G'], 'g.-', label='val', alpha=0.7)
+                plt.grid()
+                plt.legend()
+                plt_ind += 1
+
+                # plt.subplot(hh, ww, plt_ind)
+                # plt.title('learning rates')
+                # plt.plot(plots["lr D"], 'b.-', label='lr discriminator', alpha=0.7)
+                # plt.plot(plots["lr G"], 'm.-', label='lr generator', alpha=0.7)
+                # plt.legend()
+                # plt_ind += 1
+
+                plt.subplot(hh, ww, plt_ind)
+                plt.title("Discriminator A predictions")
+                plt.hist(plots["hist real A"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
+                plt.hist(plots["hist gen A"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
+                plt.xlim((-0.05, 1.05))
+                plt.xticks(ticks=np.arange(0, 1.05, 0.1))
+                plt.legend()
+                plt_ind += 1
+
+                plt.subplot(hh, ww, plt_ind)
+                plt.title("Discriminator B predictions")
+                plt.hist(plots["hist real B"][-1], bins=50, density=True, label="real", color="green", alpha=0.7)
+                plt.hist(plots["hist gen B"][-1], bins=50, density=True, label="generated", color="red", alpha=0.7)
+                plt.xlim((-0.05, 1.05))
+                plt.xticks(ticks=np.arange(0, 1.05, 0.1))
+                plt.legend()
+                plt_ind += 1
+
+                plt.show()
+
+            draw_imgs(model, images_per_validation, val_loader_a, val_loader_b, de_norm_a, de_norm_b, is_wandb)
+
         if min_lr and get_lr(optimizer_d) <= min_lr:
             print(f'Learning process ended with early stop for discriminator after epoch {epoch}')
             break
@@ -286,8 +315,7 @@ def learning_loop(
         if min_lr and get_lr(optimizer_g) <= min_lr:
             print(f'Learning process ended with early stop for generator after epoch {epoch}')
             break
-
-    wandb.finish()
+    
     return model, optimizer_d, optimizer_g, plots
 
 

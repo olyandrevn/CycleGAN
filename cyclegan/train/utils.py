@@ -40,7 +40,7 @@ def save_model(epoch, name, model):
     artifact.add_file(model_path)
     wandb.log_artifact(artifact)
 
-def draw_imgs(model, num_images, loader_a, loader_b, de_norm_a, de_norm_b, device='cuda'):
+def draw_imgs(model, num_images, loader_a, loader_b, de_norm_a, de_norm_b, device='cuda', is_wandb=False):
     model.eval()
     with torch.no_grad():
         imgs_a = next(iter(loader_a))[:num_images].to(device)
@@ -52,33 +52,82 @@ def draw_imgs(model, num_images, loader_a, loader_b, de_norm_a, de_norm_b, devic
         rec_a = model.G_BA(fake_b)
         rec_b = model.G_AB(fake_a)
 
-        # Log images from A
-        table_a = wandb.Table(columns=["Original from A", "Translated to B", "Reconstructed A"])
+         # Draw num_images examples for A
+        fig, ax = plt.subplots(num_images, 3, figsize=(25, 15))
+        plt.suptitle("Images from A", y=0.92)
+
         for ind in range(num_images):
-            orig_a = de_norm_a(imgs_a[ind], normalized=True)
-            trans_b = de_norm_b(fake_b[ind], normalized=True)
-            recon_a = de_norm_a(rec_a[ind], normalized=True)
+            plt.subplot(num_images, 3, ind * 3 + 1)
+            plt.title("Original from A")
+            plt.imshow(de_norm_a(imgs_a[ind], normalized=True))
+            plt.xticks([])
+            plt.yticks([])
 
-            table_a.add_data(
-                wandb.Image(orig_a, caption="Original from A"),
-                wandb.Image(trans_b, caption="Translated to B"),
-                wandb.Image(recon_a, caption="Reconstructed A")
-            )
-        wandb.log({"Images from A": table_a})
+            plt.subplot(num_images, 3, ind * 3 + 2)
+            plt.title("Translated to B")
+            plt.imshow(de_norm_b(fake_b[ind], normalized=True))
+            plt.xticks([])
+            plt.yticks([])
 
-        # Log images from B
-        table_b = wandb.Table(columns=["Original from B", "Translated to A", "Reconstructed B"])
+            plt.subplot(num_images, 3, ind * 3 + 3)
+            plt.title("Reconstructed A")
+            plt.imshow(de_norm_a(rec_a[ind], normalized=True))
+            plt.xticks([])
+            plt.yticks([])
+
+        # Draw num_images examples for B
+        fig, ax = plt.subplots(num_images, 3, figsize=(25, 15))
+        plt.suptitle("Images from B", y=0.92)
+
         for ind in range(num_images):
-            orig_b = de_norm_b(imgs_b[ind], normalized=True)
-            trans_a = de_norm_a(fake_a[ind], normalized=True)
-            recon_b = de_norm_b(rec_b[ind], normalized=True)
+            plt.subplot(num_images, 3, ind * 3 + 1)
+            plt.title("Original from B")
+            plt.imshow(de_norm_b(imgs_b[ind], normalized=True))
+            plt.xticks([])
+            plt.yticks([])
 
-            table_b.add_data(
-                wandb.Image(orig_b, caption="Original from B"),
-                wandb.Image(trans_a, caption="Translated to A"),
-                wandb.Image(recon_b, caption="Reconstructed B")
-            )
-        wandb.log({"Images from B": table_b})
+            plt.subplot(num_images, 3, ind * 3 + 2)
+            plt.title("Translated to A")
+            plt.imshow(de_norm_a(fake_a[ind], normalized=True))
+            plt.xticks([])
+            plt.yticks([])
+
+            plt.subplot(num_images, 3, ind * 3 + 3)
+            plt.title("Reconstructed B")
+            plt.imshow(de_norm_b(rec_b[ind], normalized=True))
+            plt.xticks([])
+            plt.yticks([])
+
+        plt.show()
+
+        if is_wandb:
+            # Log images from A
+            table_a = wandb.Table(columns=["Original from A", "Translated to B", "Reconstructed A"])
+            for ind in range(num_images):
+                orig_a = de_norm_a(imgs_a[ind], normalized=True)
+                trans_b = de_norm_b(fake_b[ind], normalized=True)
+                recon_a = de_norm_a(rec_a[ind], normalized=True)
+
+                table_a.add_data(
+                    wandb.Image(orig_a, caption="Original from A"),
+                    wandb.Image(trans_b, caption="Translated to B"),
+                    wandb.Image(recon_a, caption="Reconstructed A")
+                )
+            wandb.log({"Images from A": table_a})
+
+            # Log images from B
+            table_b = wandb.Table(columns=["Original from B", "Translated to A", "Reconstructed B"])
+            for ind in range(num_images):
+                orig_b = de_norm_b(imgs_b[ind], normalized=True)
+                trans_a = de_norm_a(fake_a[ind], normalized=True)
+                recon_b = de_norm_b(rec_b[ind], normalized=True)
+
+                table_b.add_data(
+                    wandb.Image(orig_b, caption="Original from B"),
+                    wandb.Image(trans_a, caption="Translated to A"),
+                    wandb.Image(recon_b, caption="Reconstructed B")
+                )
+            wandb.log({"Images from B": table_b})
 
 def beautiful_int(i):
     i = str(i)
