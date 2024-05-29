@@ -117,3 +117,34 @@ def model_num_params(model, verbose_all=False, verbose_only_learnable=False):
             f"\n . {sm}:\n .   - {beautiful_int(submodules[sm][0])} params\n .   - {beautiful_int(submodules[sm][1])} learnable params"
         )
     return sum_params, sum_learnable_params
+
+
+def display_image_pairs(dataset, model, num_images, de_normalize_a, de_normalize_b, device='cuda', dataset_type='A'):
+    """
+    Display pairs of images from the dataset and their corresponding generated images.
+
+    Parameters:
+    - dataset: The dataset containing the images.
+    - model: The model used to generate the images.
+    - num_images: The number of image pairs to display.
+    - device: The device to run the model on (e.g., 'cpu' or 'cuda').
+
+    """
+    fig, axes = plt.subplots(num_images, 2, figsize=(5, 2 * num_images))
+
+    for i in range(num_images):
+        img_ind = i
+        if dataset_type == 'A':
+            img = dataset.test_a[img_ind].to(device).unsqueeze(0)
+            fake = model.G_AB(img)
+        else:
+            img = dataset.test_a[img_ind].to(device).unsqueeze(0)
+            fake = model.G_BA(img)
+
+        axes[i, 0].imshow(de_normalize_a(img[0]))
+        axes[i, 0].axis('off')
+
+        axes[i, 1].imshow(de_normalize_b(fake[0]))
+        axes[i, 1].axis('off')
+
+    plt.show()
