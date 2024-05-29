@@ -264,6 +264,8 @@ def learning_loop(
                 },
                 os.path.join(chkp_folder, model_name + '.pt'),
             )
+            
+            save_model(epoch, model_name, model)
 
             # Scheduler step
             if scheduler_d:

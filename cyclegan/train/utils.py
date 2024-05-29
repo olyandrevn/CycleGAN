@@ -4,6 +4,7 @@ import warnings
 import torch
 from collections import defaultdict
 from termcolor import colored
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -31,6 +32,13 @@ def get_lr(optimizer):
     for param_group in optimizer.param_groups:
         return param_group['lr']
 
+def save_model(epoch, name, model):
+    artifact = wandb.Artifact(name, type='model', metadata=dict(epochs=epoch))
+    model_path = os.path.join('model', name+'_epoch-{}.pth'.format(epoch))
+    Path('model').mkdir(parents=True, exist_ok=True)
+    torch.save(model.state_dict(), model_path)
+    artifact.add_file(model_path)
+    wandb.log_artifact(artifact)
 
 def draw_imgs(model, num_images, loader_a, loader_b, de_norm_a, de_norm_b, device='cuda'):
     model.eval()
