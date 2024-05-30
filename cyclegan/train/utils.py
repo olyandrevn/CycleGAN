@@ -14,14 +14,14 @@ def get_model_name(chkp_folder, model_name=None):
             num_starts = len(os.listdir(chkp_folder)) + 1
         else:
             num_starts = 1
-        model_name = f'model#{num_starts}'
+        model_name = f'model.{num_starts}'
     else:
-        if "#" not in model_name:
-            model_name += "#0"
+        if "." not in model_name:
+            model_name += ".0"
     changed = False
     while os.path.exists(os.path.join(chkp_folder, model_name + '.pt')):
-        model_name, ind = model_name.split("#")
-        model_name += f"#{int(ind) + 1}"
+        model_name, ind = model_name.split(".")
+        model_name += f".{int(ind) + 1}"
         changed=True
     if changed:
         warnings.warn(f"Selected model_name was used already! To avoid possible overwrite - model_name changed to {model_name}")
