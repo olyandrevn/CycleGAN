@@ -6,6 +6,9 @@ def main():
     packages = find_packages(package_name)
     packages = list(map(lambda x: f'{package_name}/{x}', packages))
 
+    with open('requirements.txt') as f:
+        install_requires = f.read().splitlines()
+
     setup(
         name=package_name,
         version='0.0.1',
@@ -19,8 +22,7 @@ def main():
             "Operating System :: OS Independent",
         ],
         python_requires='>=3.7',
-        install_requires=[
-        ],
+        install_requires=install_requires,
     )
 
 

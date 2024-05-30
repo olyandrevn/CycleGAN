@@ -1,0 +1,9 @@
+opencv-python-headless==4.9.0.80
+numpy==1.25.2
+torch==2.3.0
+torchvision==0.18.0
+termcolor==2.4.0
+matplotlib==3.7.1
+tqdm==4.66.4
+wandb==0.17.0
+ipython==7.34.0

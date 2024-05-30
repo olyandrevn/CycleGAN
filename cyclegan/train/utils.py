@@ -118,7 +118,6 @@ def model_num_params(model, verbose_all=False, verbose_only_learnable=False):
         )
     return sum_params, sum_learnable_params
 
-
 def display_image_pairs(dataset, model, num_images, de_normalize_a, de_normalize_b, device='cuda', dataset_type='A'):
     """
     Display pairs of images from the dataset and their corresponding generated images.
@@ -135,16 +134,22 @@ def display_image_pairs(dataset, model, num_images, de_normalize_a, de_normalize
     for i in range(num_images):
         img_ind = i
         if dataset_type == 'A':
-            img = dataset.test_a[img_ind].to(device).unsqueeze(0)
-            fake = model.G_AB(img)
+            img_a = dataset.test_a[img_ind].to(device).unsqueeze(0)
+            fake_b = model.G_AB(img_a)
+
+            axes[i, 0].imshow(de_normalize_a(img_a[0]))
+            axes[i, 0].axis('off')
+
+            axes[i, 1].imshow(de_normalize_b(fake_b[0]))
+            axes[i, 1].axis('off')
         else:
-            img = dataset.test_a[img_ind].to(device).unsqueeze(0)
-            fake = model.G_BA(img)
+            img_b = dataset.test_b[img_ind].to(device).unsqueeze(0)
+            fake_a = model.G_BA(img_b)
 
-        axes[i, 0].imshow(de_normalize_a(img[0]))
-        axes[i, 0].axis('off')
+            axes[i, 0].imshow(de_normalize_b(img_b[0]))
+            axes[i, 0].axis('off')
 
-        axes[i, 1].imshow(de_normalize_b(fake[0]))
-        axes[i, 1].axis('off')
+            axes[i, 1].imshow(de_normalize_a(fake_a[0]))
+            axes[i, 1].axis('off')
 
     plt.show()
